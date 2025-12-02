@@ -1,45 +1,49 @@
 import { expect, test } from "bun:test";
-const input = `L68
-L30
-R48
-L5
-R60
-L55
-L1
-L99
-R14
-L82`;
+import fs from "fs";
 
-test("day 1", () => {
+const input = fs.readFileSync("./input/day01.txt", "utf8");
+
+test("day 1a", () => {
     let cur = 50;
     let count = 0;
+
     input.split("\n").forEach((line) => {
-        const dir = line[0];
-        const dist = parseInt(line.slice(1), 10);
+        const dir = line[0] === "L" ? -1 : 1;
+        const dist = (parseInt(line.slice(1), 10) % 100) * dir;
 
-        // 50
-        // turn L 75
-        // 25
+        cur = (cur + dist) % 100;
 
-        if (dir === "L") {
-            cur -= dist;
-            if (cur < 0) {
-                cur = 100 + cur;;
-            }
-        } else {
-            cur += dist;
-            if (cur >= 100) {
-                cur = cur - 100;
-            }
-        }
-        // cur = Math.abs(cur) % 100;
-        console.log(line, cur);
-        if (cur === 0) {
-            count += 1;
-        }
-
+        if (cur === 0) count += 1;
     });
 
-    console.log(Math.abs(cur));
-    expect(count).toBe(3);
+    console.log("Solution: ", count);
+});
+
+test("day 1b", () => {
+    let cur = 50;
+    let count = 0;
+
+    input.split("\n").forEach((line) => {
+        let prevIsZero = cur === 0;
+        const dir = line[0] === "L" ? -1 : 1;
+        const dist = parseInt(line.slice(1), 10);
+        count += Math.floor(dist / 100);
+        cur += Math.abs(dist % 100) * dir;
+
+        if (cur < 0) {
+            if (!prevIsZero) count++;
+
+            cur = 100 + cur;
+        }
+
+        if (cur >= 100) {
+            if (cur !== 100) count++;
+            cur = cur - 100;
+        }
+
+
+        if (cur === 0) count += 1;
+    });
+
+    console.log("Solution:  ", count);
 });
